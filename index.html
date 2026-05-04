@@ -208,122 +208,58 @@
 
   <script>
     let schedule = [];
+let config = null;
 
-    function toSeconds(timeStr) {
-      const [h, m] = timeStr.split(":").map(Number);
-      return (h * 3600) + (m * 60);
-    }
+function nowSeconds(){
+  const d = new Date();
+  return d.getHours()*3600 + d.getMinutes()*60 + d.getSeconds();
+}
 
-    function nowSeconds() {
-      const d = new Date();
-      return (d.getHours() * 3600) + (d.getMinutes() * 60) + d.getSeconds();
-    }
+function load(){
+  fetch("schedule.json")
+    .then(r=>r.json())
+    .then(data=>{
+      config = data;
+      run();
+      setInterval(run, 10000);
+    });
+}
 
-    function getVideoId(input) {
-      if (!input) return "";
-      const trimmed = String(input).trim();
+function run(){
+  if(!config) return;
 
-      if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
+  const now = new Date();
+  const currentHour = now.getHours();
 
-      const patterns = [
-        /[?&]v=([a-zA-Z0-9_-]{11})/,
-        /youtu\.be\/([a-zA-Z0-9_-]{11})/,
-        /shorts\/([a-zA-Z0-9_-]{11})/,
-        /embed\/([a-zA-Z0-9_-]{11})/
-      ];
+  // قبل وقت البداية → توقف
+  if(currentHour < config.startHour){
+    document.getElementById("player").style.display="none";
+    document.getElementById("adScreen").style.display="none";
+    return;
+  }
 
-      for (const p of patterns) {
-        const m = trimmed.match(p);
-        if (m) return m[1];
-      }
+  const startSeconds = config.startHour * 3600;
 
-      return trimmed;
-    }
+  const elapsedMinutes =
+    Math.floor((nowSeconds() - startSeconds) / 60);
 
-    function getCurrentItem() {
-      if (!schedule.length) return null;
+  const index =
+    Math.floor(elapsedMinutes / config.durationMinutes);
 
-      const now = nowSeconds();
-      let current = schedule[0];
+  // انتهت القناة
+  if(index >= config.videos.length){
+    document.getElementById("player").style.display="none";
+    document.getElementById("adScreen").style.display="none";
+    return;
+  }
 
-      for (let i = 0; i < schedule.length; i++) {
-        const item = schedule[i];
-        if (now >= toSeconds(item.time)) current = item;
-      }
+  const videoId = config.videos[index];
 
-      return current;
-    }
+  document.getElementById("player").style.display="block";
+  document.getElementById("player").src =
+    `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0`;
+}
 
-    function showEmptyState(show) {
-      document.getElementById("emptyState").style.display = show ? "flex" : "none";
-      document.getElementById("player").style.display = show ? "none" : "block";
-      document.getElementById("adScreen").style.display = "none";
-      document.getElementById("overlay").style.display = show ? "none" : "block";
-    }
-
-    function playVideo(item) {
-      const id = getVideoId(item.content);
-      const elapsed = Math.max(0, nowSeconds() - toSeconds(item.time));
-
-      document.getElementById("adScreen").style.display = "none";
-      document.getElementById("emptyState").style.display = "none";
-      document.getElementById("overlay").style.display = "block";
-      document.getElementById("player").style.display = "block";
-
-      document.getElementById("player").src =
-        `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&start=${elapsed}`;
-
-      document.getElementById("programTitle").textContent = item.title || "Program";
-      document.getElementById("programMeta").textContent = "Video";
-    }
-
-    function showAd(item) {
-      document.getElementById("player").style.display = "none";
-      document.getElementById("emptyState").style.display = "none";
-      document.getElementById("overlay").style.display = "block";
-
-      document.getElementById("adScreen").style.display = "flex";
-      document.getElementById("adTitle").textContent = item.title || "إعلان";
-      document.getElementById("adText").textContent = item.content || "";
-
-      document.getElementById("programTitle").textContent = item.title || "إعلان";
-      document.getElementById("programMeta").textContent = "Ad break";
-    }
-
-    function renderCurrent() {
-      const item = getCurrentItem();
-
-      if (!item) {
-        showEmptyState(true);
-        return;
-      }
-
-      showEmptyState(false);
-
-      if (item.type === "video") {
-        playVideo(item);
-      } else {
-        showAd(item);
-      }
-    }
-
-    async function loadSchedule() {
-      try {
-        const res = await fetch("schedule.json", { cache: "no-store" });
-        if (!res.ok) throw new Error("schedule.json not found");
-        schedule = await res.json();
-        schedule.sort((a, b) => a.time.localeCompare(b.time));
-      } catch (e) {
-        schedule = [];
-        console.error(e);
-      }
-
-      renderCurrent();
-    }
-
-    loadSchedule();
-    setInterval(loadSchedule, 60000);
-    setInterval(renderCurrent, 15000);
-  </script>
+load();  </script>
 </body>
   </html>
