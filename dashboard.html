@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f0f10;
+      --panel: #1a1b1f;
+      --panel2: #23242a;
+      --text: #f3f4f6;
+      --muted: #a1a1aa;
+      --accent: #e11d48;
+      --line: rgba(255,255,255,.08);
+      --good: #16a34a;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #09090b, var(--bg));
+      color: var(--text);
+      padding: 14px;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      gap: 14px;
+    }
+
+    .hero, .card {
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      backdrop-filter: blur(10px);
+    }
+
+    .hero {
+      display: grid;
+      gap: 8px;
+    }
+
+    .hero h1 {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .hero p {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: 720px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0 0 6px;
+    }
+
+    input, select, textarea, button {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font: inherit;
+      color: var(--text);
+      background: var(--panel2);
+      outline: none;
+    }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: #73737d;
+    }
+
+    .row {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: 720px) {
+      .row { grid-template-columns: 1fr; }
+    }
+
+    .actions {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 6px;
+    }
+
+    @media (max-width: 720px) {
+      .actions { grid-template-columns: 1fr; }
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .primary { background: var(--accent); color: white; }
+    .secondary { background: #2a2b31; }
+    .good { background: var(--good); color: white; }
+    .danger { background: var(--danger); color: white; }
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .item {
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .itemTop {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+    }
+
+    .itemTitle {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .itemMeta {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+
+    .itemBtns {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .itemBtns button {
+      width: auto;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+
+    .smallNote {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .preview {
+      font-size: 13px;
+      color: var(--muted);
+      word-break: break-word;
+      line-height: 1.4;
+    }
+
+    .split {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1.1fr .9fr;
+    }
+
+    @media (max-width: 920px) {
+      .split { grid-template-columns: 1fr; }
+    }
+
+    code.inline {
+      background: rgba(255,255,255,.08);
+      padding: 2px 6px;
+      border-radius: 8px;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Dashboard</h1>
+      <p>أضف البرامج والإعلانات من الهاتف، ثم نزّل <code class="inline">schedule.json</code> وارفعه إلى نفس المشروع.</p>
+    </div>
+
+    <div class="split">
+      <div class="card">
+        <h2 style="margin-bottom:12px;">إضافة عنصر</h2>
+
+        <div class="grid">
+          <div>
+            <label for="type">النوع</label>
+            <select id="type">
+              <option value="video">Video</option>
+              <option value="ad">Ad</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="time">الوقت</label>
+            <input id="time" type="time" />
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="row">
+          <div>
+            <label for="title">العنوان</label>
+            <input id="title" placeholder="Morning Show / إعلان ساخر ..." />
+          </div>
+
+          <div>
+            <label for="content">المحتوى</label>
+            <input id="content" placeholder="YouTube URL or ad text" />
+          </div>
+        </div>
+
+        <p class="smallNote" style="margin-top:10px;">
+          للفيديو، يمكنك لصق رابط يوتيوب كامل أو المعرّف فقط. للـ Ad اكتب النص مباشرة.
+        </p>
+
+        <div class="actions">
+          <button class="primary" onclick="addItem()">إضافة</button>
+          <button class="secondary" onclick="downloadJSON()">تحميل schedule.json</button>
+          <button class="secondary" onclick="loadSaved()">استرجاع المحفوظ</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 style="margin-bottom:12px;">نصائح سريعة</h2>
+        <div class="smallNote" style="line-height:1.7">
+          1) اجعل البداية كل يوم عند أوقات واضحة مثل 08:00 أو 08:10.<br>
+          2) الفيديوهات تستحسن أن تكون قصيرة أو متوسطة حتى يبدو البث منظمًا.<br>
+          3) أضف إعلانًا بين المقاطع كي يصير الشكل أقرب لقناة فعلية.<br>
+          4) بعد كل تعديل، حمّل <code class="inline">schedule.json</code> من هنا وارفعه في GitHub.
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-bottom:12px;">الجدول الحالي</h2>
+      <div id="list" class="list"></div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "tv_schedule_v1";
+
+    let schedule = [];
+
+    function sanitizeYouTubeContent(value) {
+      const raw = String(value || "").trim();
+      if (/^[a-zA-Z0-9_-]{11}$/.test(raw)) return raw;
+
+      const patterns = [
+        /[?&]v=([a-zA-Z0-9_-]{11})/,
+        /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+        /shorts\/([a-zA-Z0-9_-]{11})/,
+        /embed\/([a-zA-Z0-9_-]{11})/
+      ];
+
+      for (const p of patterns) {
+        const m = raw.match(p);
+        if (m) return m[1];
+      }
+
+      return raw;
+    }
+
+    function saveLocal() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(schedule));
+    }
+
+    function loadSaved() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        schedule = raw ? JSON.parse(raw) : [];
+        schedule.sort((a, b) => a.time.localeCompare(b.time));
+        render();
+      } catch (e) {
+        schedule = [];
+        render();
+      }
+    }
+
+    function render() {
+      const list = document.getElementById("list");
+      if (!schedule.length) {
+        list.innerHTML = '<div class="smallNote">لا يوجد عناصر بعد.</div>';
+        return;
+      }
+
+      list.innerHTML = schedule.map((item, idx) => {
+        const kind = item.type === "video" ? "Video" : "Ad";
+        const contentLabel = item.type === "video" ? "YouTube" : "Text";
+        return `
+          <div class="item">
+            <div class="itemTop">
+              <div class="chip">${item.time} • ${kind}</div>
+              <div class="itemBtns">
+                <button class="secondary" onclick="moveUp(${idx})">↑</button>
+                <button class="secondary" onclick="moveDown(${idx})">↓</button>
+                <button class="danger" onclick="removeItem(${idx})">حذف</button>
+              </div>
+            </div>
+            <div class="itemTitle">${escapeHtml(item.title || "(بدون عنوان)")}</div>
+            <div class="itemMeta"><strong>${contentLabel}:</strong> ${escapeHtml(item.content || "")}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function addItem() {
+      const type = document.getElementById("type").value;
+      const time = document.getElementById("time").value;
+      const title = document.getElementById("title").value.trim();
+      let content = document.getElementById("content").value.trim();
+
+      if (!time) {
+        alert("اختر الوقت أولاً.");
+        return;
+      }
+
+      if (!content) {
+        alert("اكتب المحتوى أولاً.");
+        return;
+      }
+
+      if (type === "video") {
+        content = sanitizeYouTubeContent(content);
+      }
+
+      schedule.push({
+        time,
+        type,
+        title,
+        content
+      });
+
+      schedule.sort((a, b) => a.time.localeCompare(b.time));
+      saveLocal();
+      render();
+
+      document.getElementById("title").value = "";
+      document.getElementById("content").value = "";
+    }
+
+    function removeItem(idx) {
+      schedule.splice(idx, 1);
+      saveLocal();
+      render();
+    }
+
+    function moveUp(idx) {
+      if (idx <= 0) return;
+      [schedule[idx - 1], schedule[idx]] = [schedule[idx], schedule[idx - 1]];
+      saveLocal();
+      render();
+    }
+
+    function moveDown(idx) {
+      if (idx >= schedule.length - 1) return;
+      [schedule[idx + 1], schedule[idx]] = [schedule[idx], schedule[idx + 1]];
+      saveLocal();
+      render();
+    }
+
+    function downloadJSON() {
+      const blob = new Blob([JSON.stringify(schedule, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "schedule.json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    loadSaved();
+  </script>
+</body>
+            </html>
